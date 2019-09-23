@@ -9,7 +9,8 @@ export default class ProviderPageContainer extends PureComponent {
     rejectProviderRequestByOrigin: PropTypes.func.isRequired,
     origin: PropTypes.string.isRequired,
     siteImage: PropTypes.string,
-    siteTitle: PropTypes.string.isRequired,
+    siteTitle: PropTypes.string,
+    hostname: PropTypes.string,
   };
 
   static contextTypes = {
@@ -52,7 +53,7 @@ export default class ProviderPageContainer extends PureComponent {
   }
 
   render () {
-    const {origin, siteImage, siteTitle} = this.props
+    const {origin, siteImage, siteTitle, hostname} = this.props
 
     return (
       <div className="page-container provider-approval-container">
@@ -61,6 +62,7 @@ export default class ProviderPageContainer extends PureComponent {
           origin={origin}
           siteImage={siteImage}
           siteTitle={siteTitle}
+          hostname={hostname}
         />
         <PageContainerFooter
           onCancel={() => this.onCancel()}

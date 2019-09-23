@@ -25,10 +25,11 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       assert.deepEqual(controller._getMergedState(), {
         approvedOrigins: {},
         providerRequests: [{
+          hostname: 'https://example.com',
           origin: 'example.com',
           siteTitle: 'Example',
           siteImage: 'https://example.com/logo.svg',
@@ -41,10 +42,11 @@ describe('ProviderApprovalController', () => {
         keyringController: mockLockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       assert.deepEqual(controller._getMergedState(), {
         approvedOrigins: {},
         providerRequests: [{
+          hostname: 'https://example.com',
           origin: 'example.com',
           siteTitle: 'Example',
           siteImage: 'https://example.com/logo.svg',
@@ -57,15 +59,17 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example1.com', 'Example 1', 'https://example1.com/logo.svg')
-      controller._handleProviderRequest('example2.com', 'Example 2', 'https://example2.com/logo.svg')
+      controller._handleProviderRequest('example1.com', 'Example 1', 'https://example1.com/logo.svg', 'https://example1.com')
+      controller._handleProviderRequest('example2.com', 'Example 2', 'https://example2.com/logo.svg', 'https://example2.com')
       assert.deepEqual(controller._getMergedState(), {
         approvedOrigins: {},
         providerRequests: [{
+          hostname: 'https://example1.com',
           origin: 'example1.com',
           siteTitle: 'Example 1',
           siteImage: 'https://example1.com/logo.svg',
         }, {
+          hostname: 'https://example2.com',
           origin: 'example2.com',
           siteTitle: 'Example 2',
           siteImage: 'https://example2.com/logo.svg',
@@ -78,15 +82,17 @@ describe('ProviderApprovalController', () => {
         keyringController: mockLockedKeyringController,
       })
 
-      controller._handleProviderRequest('example1.com', 'Example 1', 'https://example1.com/logo.svg')
-      controller._handleProviderRequest('example2.com', 'Example 2', 'https://example2.com/logo.svg')
+      controller._handleProviderRequest('example1.com', 'Example 1', 'https://example1.com/logo.svg', 'https://example1.com')
+      controller._handleProviderRequest('example2.com', 'Example 2', 'https://example2.com/logo.svg', 'https://example2.com')
       assert.deepEqual(controller._getMergedState(), {
         approvedOrigins: {},
         providerRequests: [{
+          hostname: 'https://example1.com',
           origin: 'example1.com',
           siteTitle: 'Example 1',
           siteImage: 'https://example1.com/logo.svg',
         }, {
+          hostname: 'https://example2.com',
           origin: 'example2.com',
           siteTitle: 'Example 2',
           siteImage: 'https://example2.com/logo.svg',
@@ -101,7 +107,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       assert.ok(openPopup.calledOnce)
     })
 
@@ -112,7 +118,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockLockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       assert.ok(openPopup.calledOnce)
     })
 
@@ -131,7 +137,7 @@ describe('ProviderApprovalController', () => {
           },
         },
       })
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       assert.ok(openPopup.notCalled)
     })
   })
@@ -142,12 +148,13 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       assert.deepEqual(controller._getMergedState(), {
         providerRequests: [],
         approvedOrigins: {
           'example.com': {
+            hostname: 'https://example.com',
             siteTitle: 'Example',
             siteImage: 'https://example.com/logo.svg',
           },
@@ -160,13 +167,14 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       assert.deepEqual(controller._getMergedState(), {
         providerRequests: [],
         approvedOrigins: {
           'example.com': {
+            hostname: 'https://example.com',
             siteTitle: 'Example',
             siteImage: 'https://example.com/logo.svg',
           },
@@ -184,6 +192,7 @@ describe('ProviderApprovalController', () => {
         providerRequests: [],
         approvedOrigins: {
           'example.com': {
+            hostname: null,
             siteTitle: null,
             siteImage: null,
           },
@@ -198,7 +207,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       controller.rejectProviderRequestByOrigin('example.com')
       assert.deepEqual(controller._getMergedState(), {
@@ -226,7 +235,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       controller.clearApprovedOrigins()
       assert.deepEqual(controller._getMergedState(), {
@@ -242,7 +251,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       assert.ok(controller.shouldExposeAccounts('example.com'))
     })
@@ -252,7 +261,7 @@ describe('ProviderApprovalController', () => {
         keyringController: mockUnlockedKeyringController,
       })
 
-      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg')
+      controller._handleProviderRequest('example.com', 'Example', 'https://example.com/logo.svg', 'https://example.com')
       controller.approveProviderRequestByOrigin('example.com')
       assert.ok(!controller.shouldExposeAccounts('bad.website'))
     })

@@ -31,19 +31,25 @@ class ProviderApprovalController extends SafeEventEmitter {
    *
    * @param {object} opts - opts for the middleware contains the origin for the middleware
    */
-  createMiddleware ({ origin, getSiteMetadata }) {
+  createMiddleware ({ senderUrl, extensionId, getSiteMetadata }) {
     return createAsyncMiddleware(async (req, res, next) => {
       // only handle requestAccounts
       if (req.method !== 'eth_requestAccounts') return next()
       // if already approved or privacy mode disabled, return early
       const isUnlocked = this.keyringController.memStore.getState().isUnlocked
+      const origin = senderUrl.hostname
       if (this.shouldExposeAccounts(origin) && isUnlocked) {
         res.result = [this.preferencesController.getSelectedAddress()]
         return
       }
       // register the provider request
-      const metadata = await getSiteMetadata(origin)
-      this._handleProviderRequest(origin, metadata.name, metadata.icon)
+      const metadata = { hostname: senderUrl.origin }
+      if (extensionId) {
+        metadata.extensionId = extensionId
+      } else {
+        Object.assign(metadata, await getSiteMetadata(origin))
+      }
+      this._handleProviderRequest(origin, metadata.name, metadata.icon, metadata.hostname)
       // wait for resolution of request
       const approved = await new Promise(resolve => this.once(`resolvedRequest:${origin}`, ({ approved }) => resolve(approved)))
       if (approved) {
@@ -61,12 +67,12 @@ class ProviderApprovalController extends SafeEventEmitter {
    * @param {string} siteTitle - The title of the document requesting full provider access
    * @param {string} siteImage - The icon of the window requesting full provider access
    */
-  _handleProviderRequest (origin, siteTitle, siteImage) {
+  _handleProviderRequest (origin, siteTitle, siteImage, hostname) {
     const { providerRequests } = this.memStore.getState()
     this.memStore.updateState({
       providerRequests: [
         ...providerRequests,
-        { origin, siteTitle, siteImage },
+        { origin, siteTitle, siteImage, hostname },
       ],
     })
     const isUnlocked = this.keyringController.memStore.getState().isUnlocked
@@ -98,6 +104,7 @@ class ProviderApprovalController extends SafeEventEmitter {
         [origin]: {
           siteTitle: providerRequest ? providerRequest.siteTitle : null,
           siteImage: providerRequest ? providerRequest.siteImage : null,
+          hostname: providerRequest ? providerRequest.hostname : null,
         },
       },
     })
